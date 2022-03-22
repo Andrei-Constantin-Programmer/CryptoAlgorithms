@@ -256,9 +256,59 @@ void crackCypherThree()
 	crackVigenereCypherNoKey(cypher, 6);
 }
 
+int getKeySize(char cypher[])
+{
+	char smallCypher[1005];
+	strcpy_s(smallCypher, cypher);
+	int size = 0;
+
+	int shifts = 0;
+	int maxShifts = 0;
+	int maxSimilarities = 0;
+
+	for (int i = strlen(cypher) - 2, spaces=1; i >= 1; spaces++, i--)
+	{
+		shifts++;
+		for (int j = 0; j < spaces; j++)
+			smallCypher[j] = ' ';
+		for (int j = spaces; j <= strlen(smallCypher); j++)
+			smallCypher[j] = cypher[j - spaces];
+
+		int similarities = 0;
+
+		for (int j = 0; j < strlen(smallCypher); j++)
+			if(cypher[j]>='A' && cypher[j]<='Z')
+				if (cypher[j] == smallCypher[j])
+				{
+					size++;
+					similarities++;
+				}
+		
+		if (similarities > maxSimilarities)
+		{
+			maxSimilarities = similarities;
+			maxShifts = shifts;
+		}
+	}
+
+	return maxShifts;
+}
+
+void crackCypherFour()
+{
+	//Get cypher
+	char file[] = "cexercise4";
+	char cypher[1000];
+	strncpy_s(cypher, getCypher(file), 30);
+
+	int keySize = getKeySize(cypher);
+
+	cout << "The key size is " << keySize << "\n\n";
+
+	crackVigenereCypherNoKey(cypher, keySize);
+}
+
 #pragma endregion Vigenere_Without_Key
-
-
 
 
 int main()
@@ -276,16 +326,20 @@ int main()
 				play = false;
 				break;
 			case 1:
-				cout << "Cypher 1: " << "\n\n";
+				cout << "Cypher 1:\n\n";
 				crackCypherOne();
 				break;
 			case 2:
-				cout << "Cypher 2: " << "\n\n";
+				cout << "Cypher 2:\n\n";
 				crackCypherTwo();
 				break;
 			case 3:
-				cout << "Cypher 3:" << "\n\n";
+				cout << "Cypher 3:\n\n";
 				crackCypherThree();
+				break;
+			case 4:
+				cout << "Cypher 4:\n\n";
+				crackCypherFour();
 				break;
 			default:
 				cout << "Sorry, that cypher does not exist";
