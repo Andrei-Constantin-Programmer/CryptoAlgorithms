@@ -271,7 +271,7 @@ int getKeySize(char cypher[])
 		shifts++;
 		for (int j = 0; j < spaces; j++)
 			smallCypher[j] = ' ';
-		for (int j = spaces; j <= strlen(smallCypher); j++)
+		for (int j = spaces; j <= strlen(smallCypher)-spaces; j++)
 			smallCypher[j] = cypher[j - spaces];
 
 		int similarities = 0;
@@ -299,7 +299,7 @@ void crackCypherFour()
 	//Get cypher
 	char file[] = "cexercise4";
 	char cypher[1000];
-	strncpy_s(cypher, getCypher(file), 30);
+	strncpy_s(cypher, getCypher(file), 1000);
 
 	int keySize = getKeySize(cypher);
 
