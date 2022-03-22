@@ -63,6 +63,8 @@ void crackCypherOne()
 	strcpy_s(auxCypher, cypher);
 
 	//Create all of the possible shifts 
+
+	cout << "Here are all possible permutations. Pick the one that looks legible\n";
 	int number = 1;
 	do
 	{
@@ -70,6 +72,7 @@ void crackCypherOne()
 		printf("%d. %s\n", number, auxCypher);
 		number++;
 	} while (strcmp(cypher, auxCypher));
+
 }
 
 void crackVigenereCypher(char cypher[], char key[])
@@ -240,14 +243,35 @@ void crackCypherThree()
 
 int main()
 {
-	cout << "Cypher 1: " << endl;
-    crackCypherOne();
+	bool play = true;
+	while (play)
+	{
+		cout << "\nWhat cypher do you want to solve (1-7)? Enter 0 to quit the application.\nChoice: ";
+		int option;
+		cin >> option;
+		switch (option)
+		{
+			case 0:
+				cout << "Goodbye!\n";
+				play = false;
+				break;
+			case 1:
+				cout << "Cypher 1: " << endl;
+				crackCypherOne();
+				break;
+			case 2:
+				cout << endl << "Cypher 2: " << endl;
+				crackCypherTwo();
+				break;
+			case 3:
+				cout << endl << "Cypher 3:" << endl;
+				crackCypherThree();
+				break;
+			default:
+				cout << "Sorry, that cypher does not exist";
+		}
+	}
 
-	cout << endl << "Cypher 2: " << endl;
-	crackCypherTwo();
-	
-	cout << endl << "Cypher 3:" << endl;
-	crackCypherThree();
 
     return 0;
 }
