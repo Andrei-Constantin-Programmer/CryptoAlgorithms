@@ -6,8 +6,11 @@ using namespace std;
 #include "Utils.h"
 #include <stdio.h>
 #include <map>
+#include "VariadicTable.h"
 
-char* shift(char cypher[])
+
+#pragma region Caesar_Cypher
+char* caesarShift(char cypher[])
 {
 	//Shift the cypher's alphabet to the left
 	for (int i = 0; i < strlen(cypher); i++)
@@ -19,37 +22,6 @@ char* shift(char cypher[])
 	return cypher;
 }
 
-map<char, float> getEnglishFrequency()
-{
-	return {
-		{'A', 8.2f},
-		{'B', 1.5f},
-		{'C', 2.7f},
-		{'D', 4.7f},
-		{'E', 13.0f},
-		{'F', 2.2f},
-		{'G', 2.0f},
-		{'H', 6.2f},
-		{'I', 6.9f},
-		{'J', 0.16f},
-		{'K', 0.81f},
-		{'L', 4.0f},
-		{'M', 2.7f},
-		{'N', 6.7f},
-		{'O', 7.8f},
-		{'P', 1.9f},
-		{'Q', 0.11f},
-		{'R', 5.9f},
-		{'S', 6.2f},
-		{'T', 9.6f},
-		{'U', 2.7f},
-		{'V', 0.97f},
-		{'W', 2.4f},
-		{'X', 0.15f},
-		{'Y', 2.0f},
-		{'Z', 0.078f},
-	};
-}
 
 void crackCypherOne()
 {
@@ -68,13 +40,16 @@ void crackCypherOne()
 	int number = 1;
 	do
 	{
-		strcpy_s(auxCypher, shift(auxCypher));
+		strcpy_s(auxCypher, caesarShift(auxCypher));
 		printf("%d. %s\n", number, auxCypher);
 		number++;
 	} while (strcmp(cypher, auxCypher));
 
 }
 
+#pragma endregion Caesar_Cypher
+
+#pragma region Vigenere_With_Key
 void crackVigenereCypher(char cypher[], char key[])
 {
 	char plainText[1000];
@@ -118,71 +93,9 @@ void crackCypherTwo()
 	crackVigenereCypher(cypher, key);
 }
 
+#pragma endregion Vigenere_With_Key
 
-void clearTable(map<char, int> table)
-{
-	table = {
-		{'A', 0},
-		{'B', 0},
-		{'C', 0},
-		{'D', 0},
-		{'E', 0},
-		{'F', 0},
-		{'G', 0},
-		{'H', 0},
-		{'I', 0},
-		{'J', 0},
-		{'K', 0},
-		{'L', 0},
-		{'M', 0},
-		{'N', 0},
-		{'O', 0},
-		{'P', 0},
-		{'Q', 0},
-		{'R', 0},
-		{'S', 0},
-		{'T', 0},
-		{'U', 0},
-		{'V', 0},
-		{'W', 0},
-		{'X', 0},
-		{'Y', 0},
-		{'Z', 0},
-	};
-}
-
-void clearTable(map<char, float> table)
-{
-	table = {
-		{'A', 0},
-		{'B', 0},
-		{'C', 0},
-		{'D', 0},
-		{'E', 0},
-		{'F', 0},
-		{'G', 0},
-		{'H', 0},
-		{'I', 0},
-		{'J', 0},
-		{'K', 0},
-		{'L', 0},
-		{'M', 0},
-		{'N', 0},
-		{'O', 0},
-		{'P', 0},
-		{'Q', 0},
-		{'R', 0},
-		{'S', 0},
-		{'T', 0},
-		{'U', 0},
-		{'V', 0},
-		{'W', 0},
-		{'X', 0},
-		{'Y', 0},
-		{'Z', 0},
-	};
-}
-
+#pragma region Frequency_Tables
 map<char, int> createFrequencyTable(char cypher[], int keyPosition, int keySize)
 {
 	map<char, int> table; //0-A, 1-B etc.
@@ -209,26 +122,56 @@ map<char, float> percentageFromFrequency(map<char, int> frequency)
 	return percentage;
 }
 
-void crackVigenereCypherNoKey(char cypher[], int keyPosition, int keySize)
+map<char, float> createPercentageTable(char cypher[], int keyPosition, int keySize)
 {
-	map<char, int> frequency = createFrequencyTable(cypher, keyPosition, keySize);
-	map<char, float> percentage = percentageFromFrequency(frequency);
+	return percentageFromFrequency(createFrequencyTable(cypher, keyPosition, keySize));
+}
 
-	cout << "Frequency in the English language:\n";
+void printFrequencyTable(map<char, float> frequency)
+{
+	for (char c = 'A'; c <= 'Z'; c++)
+		printf("  %c  ", c);
+	cout << endl;
+	for (char c = 'A'; c <= 'Z'; c++)
+		printf("%.2f ", frequency[c]);
+	cout << endl;
+}
+
+void printFrequencyTables(map<char, float> frequency)
+{
 	map<char, float> englishFreq = getEnglishFrequency();
-	for (char c = 'A'; c <= 'Z'; c++)
-		printf("%c %.2f\n", c, englishFreq[c]);
+	cout << "Frequency in the English language:\n";
+	printFrequencyTable(englishFreq);
 
-	cout << "Frequency in cypher for position " << keyPosition << " in the key:\n";
-	for (char c = 'A'; c <= 'Z'; c++)
-		printf("%c %.2f\n", c, percentage[c]);
+	cout << "Frequency in cypher:\n";
+	printFrequencyTable(frequency);
+}
 
+#pragma endregion Frequency_Tables
+
+#pragma region Vigenere_Without_Key
+char* createKeyVigenere(char cypher[], int keySize)
+{
+	//char key[100];
+	char key[] = "NKRQHL";
+	map<char, float> frequency;
+
+	frequency = createPercentageTable(cypher, 0, keySize);
+
+	printFrequencyTables(frequency);
 	cout << endl;
 
-	//Define key and plainText
-	char key[] = "NKRQHL";
-	crackVigenereCypher(cypher, key);
+	return key;
 }
+
+void crackVigenereCypherNoKey(char cypher[], int keySize)
+{
+	char key[100];
+	strcpy_s(key, createKeyVigenere(cypher, keySize));
+	
+	//crackVigenereCypher(cypher, key);
+}
+
 
 void crackCypherThree()
 {
@@ -237,8 +180,13 @@ void crackCypherThree()
 	char cypher[1000];
 	strncpy_s(cypher, getCypher(file), 1000);
 
-	crackVigenereCypherNoKey(cypher, 0, 6);
+	crackVigenereCypherNoKey(cypher, 6);
 }
+
+#pragma endregion Vigenere_Without_Key
+
+
+
 
 
 int main()
