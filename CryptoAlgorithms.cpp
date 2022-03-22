@@ -8,6 +8,8 @@ using namespace std;
 #include <map>
 #include "VariadicTable.h"
 
+char alphabeticalOrder[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 
 #pragma region Caesar_Cypher
 char* caesarShift(char cypher[])
@@ -96,6 +98,7 @@ void crackCypherTwo()
 #pragma endregion Vigenere_With_Key
 
 #pragma region Frequency_Tables
+//Create a map of frequencies based on the given cypher, key position and key size
 map<char, int> createFrequencyTable(char cypher[], int keyPosition, int keySize)
 {
 	map<char, int> table; //0-A, 1-B etc.
@@ -107,6 +110,7 @@ map<char, int> createFrequencyTable(char cypher[], int keyPosition, int keySize)
 	return table;
 }
 
+//Create a map of percentages based on the map of frequencies given
 map<char, float> percentageFromFrequency(map<char, int> frequency)
 {
 	float total = 0;
@@ -127,49 +131,118 @@ map<char, float> createPercentageTable(char cypher[], int keyPosition, int keySi
 	return percentageFromFrequency(createFrequencyTable(cypher, keyPosition, keySize));
 }
 
-void printFrequencyTable(map<char, float> frequency)
+//Print the given frequency table based on the frequency order
+void printFrequencyTable(map<char, float> frequency, char frequencyOrder[])
 {
-	for (char c = 'A'; c <= 'Z'; c++)
-		printf("  %c  ", c);
+	for (int i = 0; i < strlen(frequencyOrder); i++)
+		printf("  %c   ", frequencyOrder[i]);
 	cout << endl;
-	for (char c = 'A'; c <= 'Z'; c++)
-		printf("%.2f ", frequency[c]);
+	for (int i = 0; i < strlen(frequencyOrder); i++)
+		if(frequency[frequencyOrder[i]] < 10)
+			printf(" %.2f ", frequency[frequencyOrder[i]]);
+		else
+			printf("%.2f ", frequency[frequencyOrder[i]]);
 	cout << endl;
 }
 
-void printFrequencyTables(map<char, float> frequency)
+void printFrequencyTable(map<char, float> frequency)
+{
+	printFrequencyTable(frequency, alphabeticalOrder);
+}
+
+
+void printFrequencyTables(map<char, float> frequency, char frequencyOrder[])
 {
 	map<char, float> englishFreq = getEnglishFrequency();
 	cout << "Frequency in the English language:\n";
 	printFrequencyTable(englishFreq);
 
+	cout << endl;
+
 	cout << "Frequency in cypher:\n";
-	printFrequencyTable(frequency);
+	printFrequencyTable(frequency, frequencyOrder);
+}
+
+void shiftFrequencyOrderRight(char order[])
+{
+	char last = order[strlen(order) - 1];
+	for (int i = strlen(order) - 1; i > 0; i--)
+		order[i] = order[i - 1];
+	order[0] = last;
+}
+
+void shiftFrequencyOrderLeft(char order[])
+{
+	char first = order[0];
+	for (int i = 0; i < strlen(order) - 1; i++)
+		order[i] = order[i + 1];
+	order[strlen(order)-1] = first;
 }
 
 #pragma endregion Frequency_Tables
 
 #pragma region Vigenere_Without_Key
-char* createKeyVigenere(char cypher[], int keySize)
+bool createKeyVigenere(char key[], char cypher[], int keySize)
 {
-	//char key[100];
-	char key[] = "NKRQHL";
 	map<char, float> frequency;
 
-	frequency = createPercentageTable(cypher, 0, keySize);
+	//Calculate the key letter for each key position
+	for (int i = 0; i < keySize; i++)
+	{
+		cout << "Analysis for position " << i+1 << " in the key\n";
+		//Create the table frequency
+		frequency = createPercentageTable(cypher, i, keySize);
+		char order[30];
+		strcpy_s(order, alphabeticalOrder);
+		
+		bool cont = true;
 
-	printFrequencyTables(frequency);
-	cout << endl;
+		while (cont)
+		{
+			cout << endl;
+			printFrequencyTables(frequency, order);
+			
+			cout << "\nEnter = if this is the right frequency table, - to shift left and + to shift right. Alternatively, enter 0 to quit to the main menu.\nChoice (+, -, =, 0): ";
+			char option;
+			cin >> option;
+			switch (option)
+			{
+				case '=':
+					cont = false;
+					break;
+				case '+':
+					shiftFrequencyOrderRight(order);
+					break;
+				case '-':
+					shiftFrequencyOrderLeft(order);
+					break;
+				case '0':
+					return false;
+					break;
+				default:
+					cout << "Unknown command, try again\n";
+			}
+		}
 
-	return key;
+		key[i] = order[0];
+		cout << "\nThe chosen letter for position " << i+1 << " in the key is " << key[i] << "\n\n";
+	}
+
+	return true;
 }
 
 void crackVigenereCypherNoKey(char cypher[], int keySize)
 {
-	char key[100];
-	strcpy_s(key, createKeyVigenere(cypher, keySize));
-	
-	//crackVigenereCypher(cypher, key);
+	char key[7];
+	if (createKeyVigenere(key, cypher, keySize))
+	{
+		strncpy_s(key, key, 6);
+
+		cout << "The key is: " << key << endl;
+
+		cout << "The decyphered text is:\n";
+		crackVigenereCypher(cypher, key);
+	}
 }
 
 
@@ -188,13 +261,12 @@ void crackCypherThree()
 
 
 
-
 int main()
 {
 	bool play = true;
 	while (play)
 	{
-		cout << "\nWhat cypher do you want to solve (1-7)? Enter 0 to quit the application.\nChoice: ";
+		cout << "\nWhat cypher do you want to solve (1-7)? Enter 0 to quit the application.\nChoice (0-7): ";
 		int option;
 		cin >> option;
 		switch (option)
@@ -204,15 +276,15 @@ int main()
 				play = false;
 				break;
 			case 1:
-				cout << "Cypher 1: " << endl;
+				cout << "Cypher 1: " << "\n\n";
 				crackCypherOne();
 				break;
 			case 2:
-				cout << endl << "Cypher 2: " << endl;
+				cout << "Cypher 2: " << "\n\n";
 				crackCypherTwo();
 				break;
 			case 3:
-				cout << endl << "Cypher 3:" << endl;
+				cout << "Cypher 3:" << "\n\n";
 				crackCypherThree();
 				break;
 			default:
