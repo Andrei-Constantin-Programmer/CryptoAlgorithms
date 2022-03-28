@@ -6,11 +6,18 @@ using namespace std;
 #include <sstream>
 #include <map>
 
-char* getCypher(char fileName[])
+ifstream getFile(char fileName[])
 {
-	stringstream dir; 
+	stringstream dir;
 	dir << "G:\\.Year 2\\Term 2\\Cyber Security\\Crypto Assignment\\" << fileName << ".txt";
 	ifstream f(dir.str());
+
+	return f;
+}
+
+char* getText(char fileName[])
+{
+	ifstream f = getFile(fileName);
 
 	char cypher[1000];
 	f.getline(cypher, 1000);
