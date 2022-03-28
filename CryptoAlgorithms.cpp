@@ -310,6 +310,63 @@ void crackCypherFour()
 
 #pragma endregion Vigenere_Without_Key
 
+#pragma region Transposition
+
+void createTranspositionTable(char cypher[], int columns)
+{
+	char table[1000][10];
+
+	int line = 0, col = 0;
+	int lines = strlen(cypher) / columns;
+
+	for (int i = 0; i < strlen(cypher); i++)
+	{
+		table[line][col] = cypher[i];
+		line++;
+		if (line >= lines)
+		{
+			col++;
+			line=0;
+		}
+	}
+
+	char result[31];
+	int resPos = 0;
+	bool finished = false;
+
+	cout << "For " << columns << " columns:\n";
+	for (int i = 0; i < lines && !finished; i++)
+	{
+		for (int j = 0; j < columns && !finished; j++)
+		{
+			result[resPos] = table[i][j];
+			resPos++;
+			if (resPos > 30)
+				finished=true;
+		}
+	}
+
+	strncpy_s(result, result, 30);
+	cout << result << endl;
+}
+
+void crackCypherFive()
+{
+	char file[] = "cexercise5";
+	char cypher[1000];
+	strncpy_s(cypher, getCypher(file), 1000);
+
+	createTranspositionTable(cypher, 4);
+	cout << endl;
+	createTranspositionTable(cypher, 5);
+	cout << endl;
+	createTranspositionTable(cypher, 6);
+	cout << endl;
+
+}
+
+#pragma endregion
+
 
 int main()
 {
@@ -340,6 +397,10 @@ int main()
 			case 4:
 				cout << "Cypher 4:\n\n";
 				crackCypherFour();
+				break;
+			case 5:
+				cout << "Cypher 5:\n\n";
+				crackCypherFive();
 				break;
 			default:
 				cout << "Sorry, that cypher does not exist";
