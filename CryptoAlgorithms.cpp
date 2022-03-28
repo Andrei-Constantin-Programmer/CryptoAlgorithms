@@ -310,14 +310,12 @@ void crackCypherFour()
 
 #pragma endregion Vigenere_Without_Key
 
-#pragma region Transposition
+#pragma region Transposition_Ordered
 
-void createTranspositionTable(char cypher[], int columns)
+void createTranspositionTable(char table[1000][10], char cypher[], int &lines, int columns)
 {
-	char table[1000][10];
-
 	int line = 0, col = 0;
-	int lines = strlen(cypher) / columns;
+	lines = strlen(cypher) / columns;
 
 	for (int i = 0; i < strlen(cypher); i++)
 	{
@@ -326,10 +324,13 @@ void createTranspositionTable(char cypher[], int columns)
 		if (line >= lines)
 		{
 			col++;
-			line=0;
+			line = 0;
 		}
 	}
+}
 
+void printTranspositionTable(char table[1000][10], char cypher[], int lines, int columns)
+{
 	char result[31];
 	int resPos = 0;
 	bool finished = false;
@@ -356,16 +357,34 @@ void crackCypherFive()
 	char cypher[1000];
 	strncpy_s(cypher, getCypher(file), 1000);
 
-	createTranspositionTable(cypher, 4);
+	char table[1000][10];
+	int lines = 0;
+	createTranspositionTable(table, cypher, lines, 4);
+	printTranspositionTable(table, cypher, lines, 4);
 	cout << endl;
-	createTranspositionTable(cypher, 5);
+	createTranspositionTable(table, cypher, lines, 5);
+	printTranspositionTable(table, cypher, lines, 5);
 	cout << endl;
-	createTranspositionTable(cypher, 6);
+	createTranspositionTable(table, cypher, lines, 6);
+	printTranspositionTable(table, cypher, lines, 6);
 	cout << endl;
 
 }
 
-#pragma endregion
+#pragma endregion Transposition_Ordered
+
+#pragma endregion Transposition_Arbitrary
+
+void crackCypherSix()
+{
+	char file[] = "cexercise6";
+	char cypher[1000];
+	strncpy_s(cypher, getCypher(file), 1000);
+
+	//createTranspositionTable(cypher, 6);
+}
+
+#pragma endregion Transposition_Arbitrary
 
 
 int main()
